@@ -12,10 +12,25 @@ public class client {
 
         Socket clientSocket = new Socket(IP, PORT);
         BufferedReader input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        PrintWriter output = new PrintWriter(clientSocket.getOutputStream(), true);
 
-        String inputLine = input.readLine();
-        System.out.println("[Server : ]" + inputLine);
+        BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
 
+        String userInputLine;
+        while ((userInputLine = userInput.readLine()) != null) {
+            // 1
+            output.println(userInputLine);
+
+            // 2
+            String response = input.readLine();
+            System.out.println("[Server] : " + response);
+
+            if (userInputLine.equals("exit")) {
+                break;
+            }
+        }
+
+        // 3
         clientSocket.close();
         System.exit(0);
 

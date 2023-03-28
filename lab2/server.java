@@ -16,21 +16,28 @@ public class server {
 
         // 2
         Socket clientSocket = serverSocket.accept();
-        System.out.println(" Server Connected to Client");
+        System.out.println("Server Connected to Client");
 
         // 3
         PrintWriter output = new PrintWriter(clientSocket.getOutputStream(), true);
+        BufferedReader input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-        // 4
-        InetAddress localIP = InetAddress.getLocalHost();
-        String serverDate = localIP + " : " + new Date().toString();
+        String inputLine;
+        while ((inputLine = input.readLine()) != null) {
+            // 4
+            String upperCaseInput = inputLine.toUpperCase();
+            System.out.println("[Client] : " + inputLine);
+            System.out.println("[Server] : " + upperCaseInput);
 
-        // 5
-        System.out.println(serverDate);
-        System.out.println("[Server] : Sent Date Closing..........");
+            // 5
+            output.println(upperCaseInput);
+
+            if (inputLine.equals("exit")) {
+                break;
+            }
+        }
 
         // 6
-
         serverSocket.close();
         clientSocket.close();
 
