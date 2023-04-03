@@ -6,7 +6,7 @@ import java.util.*;
 
 public class server {
 
-    private static final int PORT = 9999;
+    private static final int PORT = 1234;
 
     public static void main(String[] args) throws IOException {
 
