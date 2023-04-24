@@ -13,11 +13,9 @@ public class server {
         // 1
         ServerSocket serverSocket = new ServerSocket(PORT);
         System.out.println("Waiting for connection.........");
-
         // 2
         Socket clientSocket = serverSocket.accept();
         System.out.println("Server Connected to Client");
-
         // 3
         PrintWriter output = new PrintWriter(clientSocket.getOutputStream(), true);
         BufferedReader input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -28,7 +26,6 @@ public class server {
             String upperCaseInput = inputLine.toUpperCase();
             System.out.println("[Client] : " + inputLine);
             System.out.println("[Server] : " + upperCaseInput);
-
             // 5
             output.println(upperCaseInput);
 
