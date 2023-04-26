@@ -3,7 +3,7 @@ package javaChatRoomApp;
 import java.net.*;
 import java.util.Scanner;
 import java.io.*;
-
+ 
 public class server {
    
 
@@ -40,9 +40,12 @@ class ClientHandler implements Runnable {
     public void run() {
         String inputLine;
         try {
+            InetAddress clientAddress = clientSocket.getInetAddress();
+            System.out.println("Client " + clientAddress + " connected.");
+
             while ((inputLine = input.readLine()) != null) {
                 String upperCaseInput = inputLine.toUpperCase();
-                System.out.println("[Client] : " + inputLine);
+                System.out.println("[Client " + clientAddress.getHostName() + "] : " + inputLine);
                 System.out.println("[Server] : " + upperCaseInput);
                 output.println(upperCaseInput);
                 if (inputLine.equals("exit")) {
