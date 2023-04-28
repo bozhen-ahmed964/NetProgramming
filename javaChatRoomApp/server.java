@@ -46,13 +46,14 @@ class ClientHandler implements Runnable {
             System.out.println("Client " + name + " connected.");
 
             while ((inputLine = input.readLine()) != null) {
+                if (inputLine.equals("/exit")) { // check for exit 
+                    System.out.println("Client " + name + " disconnected.");
+                    break;
+                }
                 String upperCaseInput = inputLine.toUpperCase();
                 System.out.println(name + " : " + inputLine);
                 System.out.println("[Server] : " + upperCaseInput);
                 output.println("[" + name + "] " + upperCaseInput);
-                if (inputLine.equals("exit")) {
-                    break;
-                }
             }
             clientSocket.close();
         } catch (IOException e) {
@@ -60,4 +61,5 @@ class ClientHandler implements Runnable {
             System.out.println(e.getMessage());
         }
     }
+
 }
