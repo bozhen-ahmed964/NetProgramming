@@ -30,24 +30,26 @@ class ClientHandler implements Runnable {
     private Socket clientSocket;
     private BufferedReader input;
     private PrintWriter output;
+    private String name;
 
     public ClientHandler(Socket socket) throws IOException {
         this.clientSocket = socket;
         this.input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         this.output = new PrintWriter(clientSocket.getOutputStream(), true);
+        this.name = input.readLine();
     }
 
     public void run() {
         String inputLine;
         try {
             InetAddress clientAddress = clientSocket.getInetAddress();
-            System.out.println("Client " + clientAddress + " connected.");
+            System.out.println("Client " + name + " connected.");
 
             while ((inputLine = input.readLine()) != null) {
                 String upperCaseInput = inputLine.toUpperCase();
-                System.out.println("[Client " + clientAddress.getHostName() + "] : " + inputLine);
+                System.out.println(name + " : " + inputLine);
                 System.out.println("[Server] : " + upperCaseInput);
-                output.println(upperCaseInput);
+                output.println("[" + name + "] " + upperCaseInput);
                 if (inputLine.equals("exit")) {
                     break;
                 }
