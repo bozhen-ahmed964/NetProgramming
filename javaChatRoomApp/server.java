@@ -1,6 +1,7 @@
 package javaChatRoomApp;
 
 import java.net.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.*;
 
@@ -15,12 +16,49 @@ public class server {
         ServerSocket serverSocket = new ServerSocket(port);
         System.out.println("Waiting for connection.........");
 
+        ArrayList<Socket> clientSockets = new ArrayList<Socket>();
+
+        // start the broadcast handler thread
+        BroadcastHandler broadcastHandler = new BroadcastHandler(clientSockets);
+        Thread broadcastThread = new Thread(broadcastHandler);
+        broadcastThread.start();
+
         while (true) {
             Socket clientSocket = serverSocket.accept();
+            clientSockets.add(clientSocket);
             System.out.println("Server Connected to Client");
 
-            Thread t = new Thread(new ClientHandler(clientSocket));
+            Thread t = new Thread(new ClientHandler(clientSocket, broadcastHandler));
             t.start();
+        }
+    }
+}
+
+class BroadcastHandler implements Runnable {
+    private ArrayList<Socket> clientSockets;
+
+    public BroadcastHandler(ArrayList<Socket> clientSockets) {
+        this.clientSockets = clientSockets;
+    }
+
+    public void run() {
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            String message = scanner.nextLine();
+            broadcastMessage("[Server] " + message);
+        }
+    }
+
+    public void broadcastMessage(String message) {
+        for (Socket socket : clientSockets) {
+            try {
+                PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
+                output.println(message);
+            } catch (IOException e) {
+                System.out.println("Exception caught when trying to write to socket");
+                System.out.println(e.getMessage());
+            }
         }
     }
 }
@@ -30,11 +68,13 @@ class ClientHandler implements Runnable {
     private BufferedReader input;
     private PrintWriter output;
     private String name;
+    private BroadcastHandler broadcastHandler;
 
-    public ClientHandler(Socket socket) throws IOException {
+    public ClientHandler(Socket socket, BroadcastHandler broadcastHandler) throws IOException {
         this.clientSocket = socket;
         this.input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         this.output = new PrintWriter(clientSocket.getOutputStream(), true);
+        this.broadcastHandler = broadcastHandler;
         this.name = input.readLine();
     }
 
@@ -50,7 +90,7 @@ class ClientHandler implements Runnable {
                     break;
                 }
                 System.out.println(name + " : " + inputLine);
-                output.println("[" + name + "] " + inputLine);
+                broadcastHandler.broadcastMessage("[" + name + "] " + inputLine);
             }
             clientSocket.close();
         } catch (IOException e) {
@@ -58,5 +98,4 @@ class ClientHandler implements Runnable {
             System.out.println(e.getMessage());
         }
     }
-
 }

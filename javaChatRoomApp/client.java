@@ -22,16 +22,38 @@ public class client {
 
         output.println(name);
 
+        // Create a separate thread to continuously read input from the server
+        Thread serverInputThread = new Thread(new ServerInputHandler(input));
+        serverInputThread.start();
+
         String userInputLine;
         while ((userInputLine = userInput.readLine()) != null) {
             output.println(userInputLine);
-            String response = input.readLine();
-            System.out.println(response);
             if (userInputLine.equals("exit")) {
                 break;
             }
         }
         clientSocket.close();
         System.exit(0);
+    }
+
+    static class ServerInputHandler implements Runnable {
+        private BufferedReader input;
+
+        public ServerInputHandler(BufferedReader input) {
+            this.input = input;
+        }
+
+        public void run() {
+            String inputLine;
+            try {
+                while ((inputLine = input.readLine()) != null) {
+                    System.out.println(inputLine);
+                }
+            } catch (IOException e) {
+                System.out.println("Exception caught when trying to read/write from socket");
+                System.out.println(e.getMessage());
+            }
+        }
     }
 }
