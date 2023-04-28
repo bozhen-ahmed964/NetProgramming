@@ -3,9 +3,8 @@ package javaChatRoomApp;
 import java.net.*;
 import java.util.Scanner;
 import java.io.*;
- 
+
 public class server {
-   
 
     public static void main(String[] args) throws IOException {
 
@@ -46,14 +45,12 @@ class ClientHandler implements Runnable {
             System.out.println("Client " + name + " connected.");
 
             while ((inputLine = input.readLine()) != null) {
-                if (inputLine.equals("/exit")) { // check for exit 
+                if (inputLine.equals("/exit")) { // check for exit
                     System.out.println("Client " + name + " disconnected.");
                     break;
                 }
-                String upperCaseInput = inputLine.toUpperCase();
                 System.out.println(name + " : " + inputLine);
-                System.out.println("[Server] : " + upperCaseInput);
-                output.println("[" + name + "] " + upperCaseInput);
+                output.println("[" + name + "] " + inputLine);
             }
             clientSocket.close();
         } catch (IOException e) {
