@@ -49,7 +49,10 @@ class BroadcastHandler implements Runnable {
 
         while (true) {
             String message = scanner.nextLine();
-            if (message.equals("/log")) {
+            if (message.startsWith("/kick ")) {
+                String nameToKick = message.substring(6);
+                kickClient(nameToKick);
+            } else if (message.equals("/log")) {
                 logConnectedClients();
             } else {
                 broadcastMessage("[Server] " + message);
@@ -73,6 +76,32 @@ class BroadcastHandler implements Runnable {
         System.out.println("Connected Clients:");
         for (String name : clientNames) {
             System.out.println("- " + name + " (" + new Date() + ")");
+        }
+    }
+
+    public void kickClient(String nameToKick) {
+        for (int i = 0; i < clientNames.size(); i++) {
+            if (clientNames.get(i).equals(nameToKick)) {
+                Socket socketToKick = clientSockets.get(i);
+                PrintWriter output;
+                try {
+                    output = new PrintWriter(socketToKick.getOutputStream(), true);
+                    output.println("[Server] You have been kicked out by the server.");
+                } catch (IOException e) {
+                    System.out.println("Exception caught when trying to write to socket");
+                    System.out.println(e.getMessage());
+                }
+                try {
+                    socketToKick.close();
+                } catch (IOException e) {
+                    System.out.println("Exception caught when trying to close socket");
+                    System.out.println(e.getMessage());
+                }
+                clientSockets.remove(i);
+                clientNames.remove(i);
+                System.out.println(nameToKick + " has been kicked out by the server.");
+                break;
+            }
         }
     }
 }
