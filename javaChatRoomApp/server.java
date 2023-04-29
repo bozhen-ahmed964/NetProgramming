@@ -2,6 +2,7 @@ package javaChatRoomApp;
 
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Scanner;
 import java.io.*;
 
@@ -36,9 +37,11 @@ public class server {
 
 class BroadcastHandler implements Runnable {
     private ArrayList<Socket> clientSockets;
+    ArrayList<String> clientNames;
 
     public BroadcastHandler(ArrayList<Socket> clientSockets) {
         this.clientSockets = clientSockets;
+        this.clientNames = new ArrayList<String>();
     }
 
     public void run() {
@@ -46,7 +49,11 @@ class BroadcastHandler implements Runnable {
 
         while (true) {
             String message = scanner.nextLine();
-            broadcastMessage("[Server] " + message);
+            if (message.equals("/log")) {
+                logConnectedClients();
+            } else {
+                broadcastMessage("[Server] " + message);
+            }
         }
     }
 
@@ -59,6 +66,13 @@ class BroadcastHandler implements Runnable {
                 System.out.println("Exception caught when trying to write to socket");
                 System.out.println(e.getMessage());
             }
+        }
+    }
+
+    public void logConnectedClients() {
+        System.out.println("Connected Clients:");
+        for (String name : clientNames) {
+            System.out.println("- " + name + " (" + new Date() + ")");
         }
     }
 }
@@ -76,6 +90,7 @@ class ClientHandler implements Runnable {
         this.output = new PrintWriter(clientSocket.getOutputStream(), true);
         this.broadcastHandler = broadcastHandler;
         this.name = input.readLine();
+        broadcastHandler.clientNames.add(name); // add client name to list
     }
 
     public void run() {
@@ -93,6 +108,7 @@ class ClientHandler implements Runnable {
                 broadcastHandler.broadcastMessage("[" + name + "] " + inputLine);
             }
             clientSocket.close();
+            broadcastHandler.clientNames.remove(name); // remove client name from list
         } catch (IOException e) {
             System.out.println("Exception caught when trying to read/write from socket");
             System.out.println(e.getMessage());
