@@ -29,7 +29,7 @@ public class client {
         String userInputLine;
         while ((userInputLine = userInput.readLine()) != null) {
             output.println(userInputLine);
-            if (userInputLine.equals("exit")) {
+            if (userInputLine.equals("/exit")) {
                 break;
             }
         }
