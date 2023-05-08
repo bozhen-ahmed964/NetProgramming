@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 import java.io.*;
-
+ 
 public class server {
 
     public static void main(String[] args) throws IOException {
@@ -19,7 +19,7 @@ public class server {
 
         ArrayList<Socket> clientSockets = new ArrayList<Socket>();
 
-        // start the broadcast handler thread
+        
         BroadcastHandler broadcastHandler = new BroadcastHandler(clientSockets);
         Thread broadcastThread = new Thread(broadcastHandler);
         broadcastThread.start();
@@ -126,7 +126,7 @@ class ClientHandler implements Runnable {
         String inputLine;
         try {
             InetAddress clientAddress = clientSocket.getInetAddress();
-            System.out.println("Client " + name + " connected.");
+            System.out.println("Client " + name + " / "+ clientAddress + " connected.");
 
             while ((inputLine = input.readLine()) != null) {
                 if (inputLine.equals("/exit")) { // check for exit

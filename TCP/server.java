@@ -1,4 +1,4 @@
-package lab2;
+package TCP;
 
 import java.net.*;
 import java.io.*;
