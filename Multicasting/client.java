@@ -6,37 +6,31 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 
 public class client {
-    
-public static void main(String[] args)throws IOException {
-    
-int portNum = 5000;
-if (args.length <= 1) {
-    portNum = Integer.parseInt(args[0]);
-}
 
+    public static void main(String[] args) throws IOException {
 
-MulticastSocket serverMulticastSocket = new MulticastSocket(portNum);
-System.out.println("multicast socket created on port : " + portNum);
+        int portNum = 5000;
+        if (args.length >= 1) {
+            portNum = Integer.parseInt(args[0]);
+        }
 
-InetAddress group = InetAddress.getByName("225.0.0.1");
-serverMulticastSocket.joinGroup(group);
-System.out.println("join group method is called ");
+        MulticastSocket clientMulticastSocket = new MulticastSocket(portNum);
+        InetAddress group = InetAddress.getByName("225.0.0.1");
+        clientMulticastSocket.joinGroup(group);
 
+        byte[] buff = new byte[1024];
+        DatagramPacket data = new DatagramPacket(buff, buff.length);
 
-boolean infinite = true;
-while (infinite) {
-    byte buff[] = new byte[1024];
-    DatagramPacket data = new DatagramPacket(buff, buff.length);
-    serverMulticastSocket.receive(data);
-    String message = new String(data.getData()).trim();
-    System.out.println("client : "  + message);
-}
-serverMulticastSocket.close();
+        while (true) {
+            clientMulticastSocket.receive(data);
+            String message = new String(data.getData(), 0, data.getLength()).trim();
+            System.out.println("Server : " + message);
 
+            if (message.equals("***")) {
+                break;
+            }
+        }
 
-
-}
-
-
-
+        clientMulticastSocket.close();
+    }
 }
