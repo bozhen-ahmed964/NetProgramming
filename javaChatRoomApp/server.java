@@ -54,9 +54,34 @@ class BroadcastHandler implements Runnable {
                 kickClient(nameToKick);
             } else if (message.equals("/log")) {
                 logConnectedClients();
-            } else {
+            }else if (message.startsWith("/send ")) {
+            String filePath = message.substring(6);
+            sendFile(filePath);
+        }
+             else {
                 broadcastMessage("[Server] " + message);
             }
+        }
+    }
+
+
+    public void sendFile(String filePath) {
+        File file = new File(filePath);
+        String fileName = file.getName();
+
+        // Read the file and send it to each client
+        try (BufferedInputStream fileInputStream = new BufferedInputStream(new FileInputStream(file))) {
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                for (Socket socket : clientSockets) {
+                    socket.getOutputStream().write(buffer, 0, bytesRead);
+                    socket.getOutputStream().flush();
+                }
+            }
+            System.out.println("File '" + fileName + "' sent to clients.");
+        } catch (IOException e) {
+            System.out.println("Error sending file: " + e.getMessage());
         }
     }
 
@@ -132,6 +157,9 @@ class ClientHandler implements Runnable {
                 if (inputLine.equals("/exit")) { // check for exit
                     System.out.println("Client " + name + " disconnected.");
                     break;
+                } else if (inputLine.startsWith("/download ")) {
+                    String filePath = inputLine.substring(10);
+                    receiveFile(filePath);
                 }
                 System.out.println(name + " : " + inputLine);
                 broadcastHandler.broadcastMessage("[" + name + "] " + inputLine);
@@ -143,4 +171,24 @@ class ClientHandler implements Runnable {
             System.out.println(e.getMessage());
         }
     }
+
+    private void receiveFile(String filePath){
+        try {
+            File file = new File(filePath);
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = input.read()) != -1) {
+                bufferedOutputStream.write(buffer, 0, bytesRead);
+                bufferedOutputStream.flush();
+            }
+
+            System.out.println("File '" + file.getName() + "' received and saved.");
+        } catch (IOException e) {
+            System.out.println("Error receiving file: " + e.getMessage());
+        }
+    }
+
 }
